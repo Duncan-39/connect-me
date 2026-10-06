@@ -25,7 +25,7 @@ Cross-cutting behaviours that span several places:
 - **Upload validation**: file type is checked by content with Pillow (`Image.open` plus `verify`, format must be JPEG, PNG or WEBP) and the extension comes from the detected format, never the upload name. Uploads are re-encoded by `clean_image` so EXIF/GPS metadata is never stored. Limits are 6 photos per user and 5 MB per file. `MAX_CONTENT_LENGTH` is only the overall request cap.
 - **Usernames are stored lowercase** (regex `[A-Za-z0-9_]{3,20}`) and double as folder names, so keep that normalisation and regex intact. It is what prevents path tricks and case-collision on Windows.
 - **CSRF**: `CSRFProtect` is global, so every POST form (including logout and delete) needs `<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">`.
-- `SECRET_KEY` comes from the environment and falls back to a dev-only value.
+- `SECRET_KEY` comes from the environment and falls back to a random per-process key (logins reset on restart).
 
 ## Scope
 
