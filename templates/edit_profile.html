@@ -6,7 +6,7 @@
 <form method="post" class="card-form">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <label>Display name <input name="display_name" maxlength="50" required
-         value="{{ v.display_name if not form else form.get('display_name', '') }}"></label>
+         value="{{ (v.display_name if not form else form.get('display_name', '')) or '' }}"></label>
   <label>Age (18-99) <input type="number" name="age" min="18" max="99" required
          value="{{ (v.age if not form else form.get('age', '')) or '' }}"></label>
   {% set g = current_user.gender if not form else form.get('gender') %}
