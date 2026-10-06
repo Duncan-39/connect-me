@@ -22,18 +22,57 @@ Not included: likes, matches, chat, search, filters, password reset.
 
 ## Setup and run
 
+### Create your own .venv
+
+The `.venv` folder is not stored in the repository (it is git-ignored), so create your own after cloning. A virtual environment keeps this project's packages separate from the rest of your system.
+
+1. Get the code and enter the project folder:
+
+   ```
+   git clone https://github.com/Duncan-39/connect-me.git
+   cd connect-me
+   ```
+
+2. Check that Python is 3.10 or newer:
+
+   ```
+   python --version
+   ```
+
+3. Create the environment. This makes a `.venv` folder in the project:
+
+   ```
+   python -m venv .venv
+   ```
+
+4. Activate it. Your prompt should then start with `(.venv)`:
+
+   | Shell                   | Command                      |
+   |-------------------------|------------------------------|
+   | Command Prompt          | `.venv\Scripts\activate.bat` |
+   | PowerShell              | `.venv\Scripts\Activate.ps1` |
+   | macOS / Linux / Git Bash | `source .venv/bin/activate` (Git Bash on Windows: `source .venv/Scripts/activate`) |
+
+   If PowerShell refuses with "running scripts is disabled", run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once, then try again.
+
+5. Confirm it is active. The path printed should point inside the project's `.venv` folder:
+
+   ```
+   python -c "import sys; print(sys.executable)"
+   ```
+
+To leave the environment later, run `deactivate`. To start over, delete the `.venv` folder and repeat from step 3.
+
 ### Option 1: venv (any terminal)
 
+With the `.venv` created and activated as above:
+
 ```
-git clone https://github.com/Duncan-39/connect-me.git
-cd connect-me
-
-python -m venv .venv
-.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
-
 pip install -r requirements.txt
 python app.py
 ```
+
+Next time, you only need to activate the `.venv` and run `python app.py`.
 
 ### Option 2: Anaconda Prompt
 
