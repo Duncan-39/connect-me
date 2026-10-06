@@ -11,7 +11,7 @@ from flask_login import (LoginManager, UserMixin, current_user, login_required,
                          login_user, logout_user)
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 from werkzeug.security import check_password_hash, generate_password_hash
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -203,6 +203,29 @@ def edit_profile():
     return render_template("edit_profile.html", genders=GENDERS, form=None)
 
 
+def clean_image(data):
+    """Validate an upload and re-encode it without metadata (EXIF/GPS).
+
+    Returns (bytes, extension) or None if it is not a real JPEG, PNG or WebP.
+    """
+    try:
+        with Image.open(BytesIO(data)) as img:
+            fmt = img.format
+            if fmt not in FORMAT_EXT:
+                return None
+            img.verify()
+        # verify() invalidates the image, so reopen it for re-encoding.
+        with Image.open(BytesIO(data)) as img:
+            img = ImageOps.exif_transpose(img)
+            out = BytesIO()
+            kwargs = {"quality": 90} if fmt == "JPEG" else {}
+            img.save(out, format=fmt, **kwargs)
+    except (UnidentifiedImageError, OSError, SyntaxError, ValueError,
+            Image.DecompressionBombError):
+        return None
+    return out.getvalue(), FORMAT_EXT[fmt]
+
+
 @app.route("/me/photos", methods=["POST"])
 @login_required
 def upload_photos():
@@ -221,16 +244,11 @@ def upload_photos():
         if len(data) > MAX_FILE_BYTES:
             flash(f"{f.filename}: larger than 5 MB.")
             continue
-        try:
-            with Image.open(BytesIO(data)) as img:
-                fmt = img.format
-                img.verify()
-        except (UnidentifiedImageError, OSError, SyntaxError):
-            fmt = None
-        if fmt not in FORMAT_EXT:
+        cleaned = clean_image(data)
+        if cleaned is None:
             flash(f"{f.filename}: only real JPG, PNG or WebP images are allowed.")
             continue
-        saved.append((data, FORMAT_EXT[fmt]))
+        saved.append(cleaned)
 
     if saved:
         os.makedirs(current_user.upload_dir, exist_ok=True)
