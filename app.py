@@ -80,8 +80,7 @@ def load_user(user_id):
 def require_complete_profile():
     """Send users with an unfinished profile to the profile form."""
     if (current_user.is_authenticated and not current_user.profile_complete
-            and request.endpoint not in ("edit_profile", "logout", "delete_account", "static")):
-            and request.endpoint not in ("edit_profile", "logout", "static",
+            and request.endpoint not in ("edit_profile", "logout", "static", "delete_account",
                                          "upload_photos", "delete_photo", "photo_file")):
         flash("Please complete your profile to continue.")
         return redirect(url_for("edit_profile"))
