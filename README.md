@@ -102,7 +102,7 @@ This creates `alice`, `bob`, `sam` and `dana`, all with the password `password12
 
 | Variable     | Purpose                                                  | Default                 |
 |--------------|----------------------------------------------------------|-------------------------|
-| `SECRET_KEY` | Signs session cookies. Set your own for anything non-local. | a dev-only placeholder |
+| `SECRET_KEY` | Signs session cookies. Set your own for anything non-local. | a random per-process key (logins reset on restart) |
 
 Windows (Command Prompt): `set SECRET_KEY=something-long-and-random`
 macOS/Linux: `export SECRET_KEY=something-long-and-random`

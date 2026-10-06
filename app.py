@@ -1,5 +1,6 @@
 import os
 import re
+import secrets
 import shutil
 import uuid
 from datetime import datetime
@@ -25,7 +26,8 @@ EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 app = Flask(__name__)
 app.config.update(
-    SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-change-me"),
+    # No published fallback: random per-process key if unset/empty (logins reset on restart).
+    SECRET_KEY=os.environ.get("SECRET_KEY") or secrets.token_hex(32),
     SQLALCHEMY_DATABASE_URI="sqlite:///" + os.path.join(BASE_DIR, "app.db"),
     # Room for MAX_PHOTOS files in one request; each file is checked separately.
     MAX_CONTENT_LENGTH=MAX_PHOTOS * MAX_FILE_BYTES + 1024 * 1024,
