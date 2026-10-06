@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Browse{% endblock %}
+{% block content %}
+<h1>Browse</h1>
+{% if not users %}<p>No other profiles yet.</p>{% endif %}
+<div class="grid">
+  {% for u in users %}
+  <a class="card" href="{{ url_for('profile', user_id=u.id) }}">
+    {% if u.main_photo %}
+    <img src="{{ url_for('photo_file', photo_id=u.main_photo.id) }}" alt="{{ u.display_name }}">
+    {% else %}
+    <img src="{{ url_for('static', filename='placeholder.svg') }}" alt="No photo">
+    {% endif %}
+    <div class="card-body"><strong>{{ u.display_name }}</strong>, {{ u.age }}</div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

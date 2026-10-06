@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}My profile{% endblock %}
+{% block content %}
+<h1>My profile</h1>
+{% set v = form if form else current_user %}
+<form method="post" class="card-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Display name <input name="display_name" maxlength="50" required
+         value="{{ v.display_name if not form else form.get('display_name', '') }}"></label>
+  <label>Age (18-99) <input type="number" name="age" min="18" max="99" required
+         value="{{ (v.age if not form else form.get('age', '')) or '' }}"></label>
+  {% set g = current_user.gender if not form else form.get('gender') %}
+  <label>Gender
+    <select name="gender" required>
+      <option value="" disabled {{ 'selected' if not g }}>Choose...</option>
+      {% for opt in genders %}<option {{ 'selected' if opt == g }}>{{ opt }}</option>{% endfor %}
+    </select></label>
+  <label>Bio <textarea name="bio" maxlength="500" rows="4">{{ v.bio if not form else form.get('bio', '') }}</textarea></label>
+  <button>Save profile</button>
+</form>
+
+<h2>Photos ({{ current_user.photos|length }}/6)</h2>
+<p class="muted">The oldest photo is your main photo.</p>
+<div class="gallery">
+  {% for p in current_user.photos %}
+  <div class="thumb">
+    <img src="{{ url_for('photo_file', photo_id=p.id) }}" alt="Your photo">
+    <form method="post" action="{{ url_for('delete_photo', photo_id=p.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="danger">Delete{{ ' (main)' if loop.first }}</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+{% if current_user.photos|length < 6 %}
+<form method="post" action="{{ url_for('upload_photos') }}" enctype="multipart/form-data" class="card-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Add photos (JPG, PNG, WebP; max 5 MB each)
+    <input type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple required></label>
+  <button>Upload</button>
+</form>
+{% endif %}
+
+<h2>Danger zone</h2>
+<form method="post" action="{{ url_for('delete_account') }}"
+      onsubmit="return confirm('Delete your account and all photos? This cannot be undone.');">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button class="danger">Delete my account</button>
+</form>
+{% endblock %}

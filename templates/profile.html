@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ user.display_name or user.username }}{% endblock %}
+{% block content %}
+<h1>{{ user.display_name }}, {{ user.age }}</h1>
+<p class="muted">{{ user.gender }}</p>
+<p class="bio">{{ user.bio or "No bio yet." }}</p>
+<div class="gallery">
+  {% for p in user.photos %}
+  <img src="{{ url_for('photo_file', photo_id=p.id) }}" alt="Photo of {{ user.display_name }}">
+  {% else %}
+  <img src="{{ url_for('static', filename='placeholder.svg') }}" alt="No photo">
+  {% endfor %}
+</div>
+<p><a href="{{ url_for('browse') }}">&larr; Back to browse</a></p>
+{% endblock %}
